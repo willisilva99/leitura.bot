@@ -36,6 +36,11 @@ async def mudar_atividade():
     atividade = random.choice(atividades)
     await bot.change_presence(activity=discord.Game(name=atividade))
 
+# ---- Comando !site ----
+@bot.command()
+async def site(ctx):
+    await ctx.send('Acesse o nosso site: http://novaera7d.com.br/')
+
 # ---- API Flask ----
 app = Flask(__name__)
 CORS(app)
@@ -75,7 +80,6 @@ def jogadores_online():
     } for member in guild.members if member.status != discord.Status.offline and not member.bot]
 
     return jsonify(membros_online)
-
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
