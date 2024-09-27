@@ -41,6 +41,12 @@ async def mudar_atividade():
 async def site(ctx):
     await ctx.send('Acesse o nosso site: http://novaera7d.com.br/')
 
+# ---- Comando !vote ----
+@bot.command()
+async def vote(ctx):
+    await ctx.send('Vote em nosso servidor: https://novaera7d.netlify.app/botao')
+
+
 # ---- API Flask ----
 app = Flask(__name__)
 CORS(app)
