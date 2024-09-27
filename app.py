@@ -77,20 +77,6 @@ def jogadores_online():
     return jsonify(membros_online)
 
 
-@app.route('/jogadores_online')
-def jogadores_online():
-    guild = bot.get_guild(1186390028990025820)  # Coloque o ID do seu servidor
-    if guild is None:
-        return jsonify({'error': 'Servidor não encontrado'}), 404
-
-    membros_online = [{
-        'id': member.id,
-        'username': member.name,
-        'status': str(member.status).capitalize(),
-    } for member in guild.members if member.status != discord.Status.offline and not member.bot]
-
-    return jsonify(membros_online)
-
 # Função para rodar a API Flask em uma thread separada
 def run_api():
     port = int(os.environ.get('PORT', 5000))  # Railway usa a variável de ambiente PORT
