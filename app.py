@@ -54,8 +54,28 @@ def get_destaques():
     if not role:
         return jsonify({'error': 'Cargo não encontrado'}), 404
 
-    members = [{'id': member.id, 'username': member.name} for member in role.members]
+    members = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None
+    } for member in role.members]
     return jsonify(members)
+
+@app.route('/jogadores_online')
+def jogadores_online():
+    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
+    if guild is None:
+        return jsonify({'error': 'Servidor não encontrado'}), 404
+
+    membros_online = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None,
+        'status': str(member.status).capitalize(),
+    } for member in guild.members if member.status != discord.Status.offline and not member.bot]
+
+    return jsonify(membros_online)
+
 
 @app.route('/jogadores_online')
 def jogadores_online():
