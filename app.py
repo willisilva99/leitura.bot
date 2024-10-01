@@ -144,14 +144,15 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Armazena a foto e o nome do jogador
+                    # Armazena a foto e o apelido (display_name) do jogador
                     fotos.append({
                         "url": attachment.url,
-                        "player": str(message.author)
+                        "player": message.author.display_name  # Usa o apelido (display name)
                     })
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
+
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
