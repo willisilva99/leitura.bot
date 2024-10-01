@@ -5,6 +5,7 @@ import random
 from flask import Flask, jsonify
 import threading
 from flask_cors import CORS
+from threading import Lock
 
 # Pega o token da variável de ambiente
 TOKEN = os.getenv('TOKEN')
@@ -17,15 +18,9 @@ intents.presences = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Lista de atividades para o bot
-atividades = [
-    "sobrevivendo ao apocalipse",
-    "jogando 7 Days to Die",
-    "enfrentando zumbis",
-]
-
-# Lista global para armazenar as fotos e informações dos jogadores
+# Lista global para armazenar as fotos e informações dos jogadores, protegida por um lock
 fotos = []
+fotos_lock = Lock()  # Lock para proteger a lista de acessos simultâneos
 
 # ---- API Flask ----
 app = Flask(__name__)
@@ -37,7 +32,8 @@ def home():
 
 @app.route('/fotos', methods=['GET'])
 def get_fotos():
-    return jsonify(fotos)
+    with fotos_lock:
+        return jsonify(fotos)
 
 @app.route('/destaques')
 def get_destaques():
@@ -82,7 +78,11 @@ async def on_ready():
 # Tarefa que muda a atividade do bot periodicamente
 @tasks.loop(minutes=5)
 async def mudar_atividade():
-    atividade = random.choice(atividades)
+    atividade = random.choice([
+        "sobrevivendo ao apocalipse",
+        "jogando 7 Days to Die",
+        "enfrentando zumbis"
+    ])
     await bot.change_presence(activity=discord.Game(name=atividade))
 
 # ---- Comando !site ----
@@ -103,10 +103,8 @@ async def missao(ctx):
 # Evento para boas-vindas a novos membros
 @bot.event
 async def on_member_join(member):
-    # ID do canal de boas-vindas (substitua pelo ID do seu canal)
-    channel = bot.get_channel(1186636197934661632)
+    channel = bot.get_channel(1186636197934661632)  # Canal de boas-vindas
 
-    # Lista de mensagens apocalípticas
     mensagens_boas_vindas = [
         f'Bem-vindo(a) ao apocalipse, {member.mention}! As hordas de zumbis estão à espreita, mas juntos sobreviveremos.',
         f'{member.mention}, você chegou na hora certa... as defesas estão baixas e precisamos de toda ajuda possível. Bem-vindo(a) à Nova Era!',
@@ -117,27 +115,20 @@ async def on_member_join(member):
         f'Os portões se fecharam atrás de você, {member.mention}. Não há mais volta. Bem-vindo(a) ao nosso pesadelo.',
         f'{member.mention}, seja bem-vindo(a) à resistência! Os zumbis estão lá fora, mas aqui... aqui, nós lutamos até o fim!'
     ]
-
-    # Escolhe uma mensagem aleatória
+    
     mensagem_escolhida = random.choice(mensagens_boas_vindas)
-
-    # Envia a mensagem no canal de boas-vindas
     if channel:
         await channel.send(mensagem_escolhida)
 
 # Evento para reagir a imagens enviadas no chat e armazenar fotos
 @bot.event
 async def on_message(message):
-    # Certifica-se de que o bot não vai reagir às próprias mensagens
     if message.author == bot.user:
         return
 
-    # Verifica se a mensagem foi enviada no canal com ID específico
-    if message.channel.id == 1262571048898138252:
-        # Verifica se a mensagem contém anexos (imagens ou outros arquivos)
+    if message.channel.id == 1262571048898138252:  # ID do canal específico
         if message.attachments:
             for attachment in message.attachments:
-                # Verifica se o arquivo é uma imagem
                 if attachment.content_type.startswith('image/'):
                     # Reage com um emoji customizado
                     emoji = bot.get_emoji(1262842500125556866)
@@ -145,10 +136,12 @@ async def on_message(message):
                         await message.add_reaction(emoji)
 
                     # Armazena a foto e o nome do jogador
-                    fotos.append({
-                        "url": attachment.url,
-                        "player": str(message.author)
-                    })
+                    with fotos_lock:  # Protege a lista com o lock
+                        fotos.append({
+                            "url": attachment.url,
+                            "player": str(message.author),
+                            "avatar": str(message.author.avatar.url if message.author.avatar else "")
+                        })
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
