@@ -16,7 +16,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.presences = True
-intents.messages = True  # Habilitar para capturar eventos de mensagens deletadas
+intents.messages = True  # Habilitar para capturar eventos de mensagens e deletar mensagens
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -54,40 +54,6 @@ def home():
 def get_fotos():
     with fotos_lock:
         return jsonify(fotos)
-
-# Adiciona rota para "Membros Online"
-@app.route('/jogadores_online', methods=['GET'])
-def jogadores_online():
-    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
-    if guild is None:
-        return jsonify({'error': 'Servidor não encontrado'}), 404
-
-    membros_online = [{
-        'id': member.id,
-        'display_name': member.display_name,
-        'avatar': member.avatar.url if member.avatar else None,
-        'status': str(member.status).capitalize(),
-    } for member in guild.members if member.status != discord.Status.offline and not member.bot]
-
-    return jsonify(membros_online)
-
-# Adiciona rota para "Destaques"
-@app.route('/destaques', methods=['GET'])
-def get_destaques():
-    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
-    if guild is None:
-        return jsonify({'error': 'Servidor não encontrado'}), 404
-
-    role = discord.utils.get(guild.roles, name="Destaque")
-    if not role:
-        return jsonify({'error': 'Cargo não encontrado'}), 404
-
-    members = [{
-        'id': member.id,
-        'display_name': member.display_name,
-        'avatar': member.avatar.url if member.avatar else None
-    } for member in role.members]
-    return jsonify(members)
 
 # ---- Bot Discord ----
 
@@ -142,13 +108,14 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
+# Evento para reagir a imagens enviadas no chat e armazenar fotos
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
     # Verifica se a mensagem foi enviada no canal correto e contém anexos
-    if message.channel.id == 1262571048898138252:
+    if message.channel.id == 1262571048898138252:  # Substitua pelo ID do seu canal
         if message.attachments:
             for attachment in message.attachments:
                 # Verifica se o anexo é uma imagem
@@ -158,13 +125,12 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Armazena a foto e o apelido do jogador
+                    # Armazena a foto e o apelido do jogador (sem avatar)
                     with fotos_lock:
                         fotos.append({
                             "message_id": message.id,
                             "url": attachment.url,
-                            "player": message.author.display_name,  # Apelido do jogador
-                            "avatar": str(message.author.avatar.url if message.author.avatar else "")
+                            "player": message.author.display_name  # Apelido do jogador
                         })
 
                     # Salva as fotos no arquivo JSON para persistência
