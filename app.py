@@ -24,11 +24,11 @@ atividades = [
     "enfrentando zumbis",
 ]
 
-# Armazena as URLs das fotos enviadas e os nomes dos jogadores
+# Lista global para armazenar as fotos e informações dos jogadores
 fotos = []
 
 # ---- API Flask ----
-app = Flask(__name__)  # Definimos o Flask aqui
+app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
