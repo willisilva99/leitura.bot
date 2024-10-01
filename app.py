@@ -46,6 +46,12 @@ async def site(ctx):
 async def vote(ctx):
     await ctx.send('Vote em nosso servidor: https://novaera7d.netlify.app/botao')
 
+# ---- Comando !missao ----
+@bot.command()
+async def missao(ctx):
+    await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
+
+
 
 # ---- API Flask ----
 app = Flask(__name__)
