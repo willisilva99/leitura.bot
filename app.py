@@ -105,13 +105,17 @@ async def on_message(message):
         if message.attachments:
             for attachment in message.attachments:
                 if attachment.content_type.startswith('image/'):
-                    fotos.append(attachment.url)  # Adiciona a URL da imagem
+                    fotos.append({
+                        "url": attachment.url,
+                        "player": str(message.author)  # Armazena o nome do jogador que postou
+                    })
     await bot.process_commands(message)
 
 # Endpoint da API que retorna as fotos para o frontend
 @app.route('/fotos', methods=['GET'])
 def get_fotos():
     return jsonify(fotos)
+
 
 
 # ---- API Flask ----
