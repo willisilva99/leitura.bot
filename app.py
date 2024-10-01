@@ -24,107 +24,20 @@ atividades = [
     "enfrentando zumbis",
 ]
 
-# Evento que indica quando o bot está pronto
-@bot.event
-async def on_ready():
-    print(f'Bot conectado como {bot.user}')
-    mudar_atividade.start()
-
-# Tarefa que muda a atividade do bot periodicamente
-@tasks.loop(minutes=5)
-async def mudar_atividade():
-    atividade = random.choice(atividades)
-    await bot.change_presence(activity=discord.Game(name=atividade))
-
-# ---- Comando !site ----
-@bot.command()
-async def site(ctx):
-    await ctx.send('Acesse o nosso site: http://novaera7d.com.br/')
-
-# ---- Comando !vote ----
-@bot.command()
-async def vote(ctx):
-    await ctx.send('Vote em nosso servidor: https://novaera7d.netlify.app/botao')
-
-# ---- Comando !missao ----
-@bot.command()
-async def missao(ctx):
-    await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
-
-@bot.event
-async def on_member_join(member):
-    # ID do canal de boas-vindas (substitua pelo ID do seu canal)
-    channel = bot.get_channel(1186636197934661632)
-    
-    # Lista de mensagens apocalípticas
-    mensagens_boas_vindas = [
-        f'Bem-vindo(a) ao apocalipse, {member.mention}! As hordas de zumbis estão à espreita, mas juntos sobreviveremos.',
-        f'{member.mention}, você chegou na hora certa... as defesas estão baixas e precisamos de toda ajuda possível. Bem-vindo(a) à Nova Era!',
-        f'Os céus estão escuros e os zumbis rondam as ruas. Seja bem-vindo(a) ao caos, {member.mention}!',
-        f'Você sobreviveu ao mundo lá fora, mas agora a verdadeira luta começa aqui. Bem-vindo(a), {member.mention}, à Nova Era!',
-        f'{member.mention}, o silêncio antes da tempestade nunca durou tanto tempo... Prepare-se para o que está por vir. Bem-vindo(a) ao refúgio!',
-        f'Você encontrou o último refúgio da humanidade, {member.mention}. Agora, é matar ou morrer. Bem-vindo(a) à Nova Era!',
-        f'Os portões se fecharam atrás de você, {member.mention}. Não há mais volta. Bem-vindo(a) ao nosso pesadelo.',
-        f'{member.mention}, seja bem-vindo(a) à resistência! Os zumbis estão lá fora, mas aqui... aqui, nós lutamos até o fim!'
-    ]
-    
-    # Escolhe uma mensagem aleatória
-    mensagem_escolhida = random.choice(mensagens_boas_vindas)
-    
-    # Envia a mensagem no canal de boas-vindas
-    if channel:
-        await channel.send(mensagem_escolhida)
-
-# Evento para reagir a imagens enviadas no chat específico
-@bot.event
-async def on_message(message):
-    # Certifica-se de que o bot não vai reagir às próprias mensagens
-    if message.author == bot.user:
-        return
-    
-    # Verifica se a mensagem foi enviada no canal com ID específico
-    if message.channel.id == 1262571048898138252:
-        # Verifica se a mensagem contém anexos (imagens ou outros arquivos)
-        if message.attachments:
-            for attachment in message.attachments:
-                # Verifica se o arquivo é uma imagem
-                if attachment.content_type.startswith('image/'):
-                    # Busca o emoji customizado pelo ID
-                    emoji = bot.get_emoji(1262842500125556866)
-                    if emoji:
-                        # Adiciona uma reação com o emoji customizado
-                        await message.add_reaction(emoji)
-    
-    # Processa os comandos caso a mensagem seja um comando
-    await bot.process_commands(message)
-
-# Evento para pegar fotos de um canal específico
-@bot.event
-async def on_message(message):
-    if message.channel.id == 1262571048898138252:  # Canal específico
-        if message.attachments:
-            for attachment in message.attachments:
-                if attachment.content_type.startswith('image/'):
-                    fotos.append({
-                        "url": attachment.url,
-                        "player": str(message.author)  # Armazena o nome do jogador que postou
-                    })
-    await bot.process_commands(message)
-
-# Endpoint da API que retorna as fotos para o frontend
-@app.route('/fotos', methods=['GET'])
-def get_fotos():
-    return jsonify(fotos)
-
-
+# Armazena as URLs das fotos enviadas e os nomes dos jogadores
+fotos = []
 
 # ---- API Flask ----
-app = Flask(__name__)
+app = Flask(__name__)  # Definimos o Flask aqui
 CORS(app)
 
 @app.route('/')
 def home():
     return jsonify({'status': 'Bot está online e rodando!'})
+
+@app.route('/fotos', methods=['GET'])
+def get_fotos():
+    return jsonify(fotos)
 
 @app.route('/destaques')
 def get_destaques():
@@ -157,6 +70,88 @@ def jogadores_online():
     } for member in guild.members if member.status != discord.Status.offline and not member.bot]
 
     return jsonify(membros_online)
+
+# ---- Bot Discord ----
+
+# Evento que indica quando o bot está pronto
+@bot.event
+async def on_ready():
+    print(f'Bot conectado como {bot.user}')
+    mudar_atividade.start()
+
+# Tarefa que muda a atividade do bot periodicamente
+@tasks.loop(minutes=5)
+async def mudar_atividade():
+    atividade = random.choice(atividades)
+    await bot.change_presence(activity=discord.Game(name=atividade))
+
+# ---- Comando !site ----
+@bot.command()
+async def site(ctx):
+    await ctx.send('Acesse o nosso site: http://novaera7d.com.br/')
+
+# ---- Comando !vote ----
+@bot.command()
+async def vote(ctx):
+    await ctx.send('Vote em nosso servidor: https://novaera7d.netlify.app/botao')
+
+# ---- Comando !missao ----
+@bot.command()
+async def missao(ctx):
+    await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
+
+# Evento para boas-vindas a novos membros
+@bot.event
+async def on_member_join(member):
+    # ID do canal de boas-vindas (substitua pelo ID do seu canal)
+    channel = bot.get_channel(1186636197934661632)
+
+    # Lista de mensagens apocalípticas
+    mensagens_boas_vindas = [
+        f'Bem-vindo(a) ao apocalipse, {member.mention}! As hordas de zumbis estão à espreita, mas juntos sobreviveremos.',
+        f'{member.mention}, você chegou na hora certa... as defesas estão baixas e precisamos de toda ajuda possível. Bem-vindo(a) à Nova Era!',
+        f'Os céus estão escuros e os zumbis rondam as ruas. Seja bem-vindo(a) ao caos, {member.mention}!',
+        f'Você sobreviveu ao mundo lá fora, mas agora a verdadeira luta começa aqui. Bem-vindo(a), {member.mention}, à Nova Era!',
+        f'{member.mention}, o silêncio antes da tempestade nunca durou tanto tempo... Prepare-se para o que está por vir. Bem-vindo(a) ao refúgio!',
+        f'Você encontrou o último refúgio da humanidade, {member.mention}. Agora, é matar ou morrer. Bem-vindo(a) à Nova Era!',
+        f'Os portões se fecharam atrás de você, {member.mention}. Não há mais volta. Bem-vindo(a) ao nosso pesadelo.',
+        f'{member.mention}, seja bem-vindo(a) à resistência! Os zumbis estão lá fora, mas aqui... aqui, nós lutamos até o fim!'
+    ]
+
+    # Escolhe uma mensagem aleatória
+    mensagem_escolhida = random.choice(mensagens_boas_vindas)
+
+    # Envia a mensagem no canal de boas-vindas
+    if channel:
+        await channel.send(mensagem_escolhida)
+
+# Evento para reagir a imagens enviadas no chat e armazenar fotos
+@bot.event
+async def on_message(message):
+    # Certifica-se de que o bot não vai reagir às próprias mensagens
+    if message.author == bot.user:
+        return
+
+    # Verifica se a mensagem foi enviada no canal com ID específico
+    if message.channel.id == 1262571048898138252:
+        # Verifica se a mensagem contém anexos (imagens ou outros arquivos)
+        if message.attachments:
+            for attachment in message.attachments:
+                # Verifica se o arquivo é uma imagem
+                if attachment.content_type.startswith('image/'):
+                    # Reage com um emoji customizado
+                    emoji = bot.get_emoji(1262842500125556866)
+                    if emoji:
+                        await message.add_reaction(emoji)
+
+                    # Armazena a foto e o nome do jogador
+                    fotos.append({
+                        "url": attachment.url,
+                        "player": str(message.author)
+                    })
+
+    # Processa os comandos caso a mensagem seja um comando
+    await bot.process_commands(message)
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
