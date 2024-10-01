@@ -16,7 +16,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.presences = True
-intents.messages = True  # Habilitar para capturar eventos de mensagens e deletar mensagens
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -54,6 +53,38 @@ def home():
 def get_fotos():
     with fotos_lock:
         return jsonify(fotos)
+
+@app.route('/destaques')
+def get_destaques():
+    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
+    if guild is None:
+        return jsonify({'error': 'Servidor não encontrado'}), 404
+
+    role = discord.utils.get(guild.roles, name="Destaque")
+    if not role:
+        return jsonify({'error': 'Cargo não encontrado'}), 404
+
+    members = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None
+    } for member in role.members]
+    return jsonify(members)
+
+@app.route('/jogadores_online')
+def jogadores_online():
+    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
+    if guild is None:
+        return jsonify({'error': 'Servidor não encontrado'}), 404
+
+    membros_online = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None,
+        'status': str(member.status).capitalize(),
+    } for member in guild.members if member.status != discord.Status.offline and not member.bot]
+
+    return jsonify(membros_online)
 
 # ---- Bot Discord ----
 
@@ -108,6 +139,7 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
+# Evento para reagir a imagens enviadas no chat e armazenar fotos
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -122,27 +154,17 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Armazena a foto e o apelido do jogador
+                    # Armazena a foto e o nome do jogador
                     with fotos_lock:  # Protege a lista com o lock
                         fotos.append({
-                            "message_id": message.id,  # Salvar o ID da mensagem para remover depois
                             "url": attachment.url,
-                            "player": message.author.display_name,  # Usar o apelido em vez do nome de usuário
+                            "player": str(message.author),
                             "avatar": str(message.author.avatar.url if message.author.avatar else "")
                         })
                     salvar_fotos()  # Salva as fotos no arquivo JSON
 
-    # Processa comandos normalmente
+    # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
-
-# Evento para remover a foto quando a mensagem for deletada (opcional)
-@bot.event
-async def on_message_delete(message):
-    if message.channel.id == 1262571048898138252:  # Verifica se é o canal correto
-        with fotos_lock:
-            # Filtrar as fotos e remover aquelas com o ID da mensagem deletada
-            fotos[:] = [foto for foto in fotos if foto["message_id"] != message.id]
-            salvar_fotos()  # Salva a lista atualizada no JSON
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
