@@ -51,7 +51,29 @@ async def vote(ctx):
 async def missao(ctx):
     await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
 
-
+@bot.event
+async def on_member_join(member):
+    # ID do canal de boas-vindas (substitua pelo ID do seu canal)
+    channel = bot.get_channel(1186636197934661632)
+    
+    # Lista de mensagens apocalípticas
+    mensagens_boas_vindas = [
+        f'Bem-vindo(a) ao apocalipse, {member.mention}! As hordas de zumbis estão à espreita, mas juntos sobreviveremos.',
+        f'{member.mention}, você chegou na hora certa... as defesas estão baixas e precisamos de toda ajuda possível. Bem-vindo(a) à Nova Era!',
+        f'Os céus estão escuros e os zumbis rondam as ruas. Seja bem-vindo(a) ao caos, {member.mention}!',
+        f'Você sobreviveu ao mundo lá fora, mas agora a verdadeira luta começa aqui. Bem-vindo(a), {member.mention}, à Nova Era!',
+        f'{member.mention}, o silêncio antes da tempestade nunca durou tanto tempo... Prepare-se para o que está por vir. Bem-vindo(a) ao refúgio!',
+        f'Você encontrou o último refúgio da humanidade, {member.mention}. Agora, é matar ou morrer. Bem-vindo(a) à Nova Era!',
+        f'Os portões se fecharam atrás de você, {member.mention}. Não há mais volta. Bem-vindo(a) ao nosso pesadelo.',
+        f'{member.mention}, seja bem-vindo(a) à resistência! Os zumbis estão lá fora, mas aqui... aqui, nós lutamos até o fim!'
+    ]
+    
+    # Escolhe uma mensagem aleatória
+    mensagem_escolhida = random.choice(mensagens_boas_vindas)
+    
+    # Envia a mensagem no canal de boas-vindas
+    if channel:
+        await channel.send(mensagem_escolhida)
 
 # ---- API Flask ----
 app = Flask(__name__)
