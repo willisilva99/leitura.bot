@@ -5,6 +5,7 @@ import random
 from flask import Flask, jsonify
 import threading
 from flask_cors import CORS
+import json
 
 # Pega o token da variável de ambiente
 TOKEN = os.getenv('TOKEN')
@@ -14,6 +15,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.presences = True
+intents.messages = True  # Para capturar eventos de mensagens deletadas
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -24,11 +26,28 @@ atividades = [
     "enfrentando zumbis",
 ]
 
-# Armazena as URLs das fotos enviadas e os nomes dos jogadores
+# Lista global para armazenar as fotos (com persistência em JSON)
 fotos = []
 
+# Carregar as fotos de um arquivo JSON (persistência)
+def carregar_fotos():
+    global fotos
+    try:
+        with open('fotos.json', 'r') as file:
+            fotos = json.load(file)
+    except FileNotFoundError:
+        fotos = []
+
+# Salvar as fotos em um arquivo JSON (persistência)
+def salvar_fotos():
+    with open('fotos.json', 'w') as file:
+        json.dump(fotos, file, indent=4)
+
+# Carregar as fotos ao iniciar o bot
+carregar_fotos()
+
 # ---- API Flask ----
-app = Flask(__name__)  # Definimos o Flask aqui
+app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
@@ -146,13 +165,22 @@ async def on_message(message):
 
                     # Armazena a foto e o apelido (display_name) do jogador
                     fotos.append({
+                        "message_id": message.id,  # Armazena o ID da mensagem para remover depois
                         "url": attachment.url,
                         "player": message.author.display_name  # Usa o apelido (display name)
                     })
+                    salvar_fotos()  # Salva as fotos no arquivo JSON
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
 
+# Evento para remover fotos quando a mensagem é deletada
+@bot.event
+async def on_message_delete(message):
+    if message.channel.id == 1262571048898138252:
+        # Remove a foto correspondente à mensagem deletada
+        fotos[:] = [foto for foto in fotos if foto["message_id"] != message.id]
+        salvar_fotos()  # Atualiza o arquivo JSON
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
