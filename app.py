@@ -123,12 +123,12 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Armazena a foto e o nome do jogador
+                   # Armazena a foto e o apelido do jogador
                     with fotos_lock:  # Protege a lista com o lock
                         fotos.append({
                             "message_id": message.id,  # Salvar o ID da mensagem para remover depois
                             "url": attachment.url,
-                            "player": str(message.author),
+                            "player": message.author.display_name,  # Usar o apelido em vez do nome de usuário
                             "avatar": str(message.author.avatar.url if message.author.avatar else "")
                         })
                     salvar_fotos()  # Salva as fotos no arquivo JSON
