@@ -98,6 +98,21 @@ async def on_message(message):
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
 
+# Evento para pegar fotos de um canal específico
+@bot.event
+async def on_message(message):
+    if message.channel.id == 1262571048898138252:  # Canal específico
+        if message.attachments:
+            for attachment in message.attachments:
+                if attachment.content_type.startswith('image/'):
+                    fotos.append(attachment.url)  # Adiciona a URL da imagem
+    await bot.process_commands(message)
+
+# Endpoint da API que retorna as fotos para o frontend
+@app.route('/fotos', methods=['GET'])
+def get_fotos():
+    return jsonify(fotos)
+
 
 # ---- API Flask ----
 app = Flask(__name__)
