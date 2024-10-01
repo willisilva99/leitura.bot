@@ -142,32 +142,35 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
-# Evento para reagir a imagens enviadas no chat e armazenar fotos
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.channel.id == 1262571048898138252:  # ID do canal específico
+    # Verifica se a mensagem foi enviada no canal correto e contém anexos
+    if message.channel.id == 1262571048898138252:
         if message.attachments:
             for attachment in message.attachments:
+                # Verifica se o anexo é uma imagem
                 if attachment.content_type.startswith('image/'):
-                    # Reage com um emoji customizado
+                    # Reage à mensagem com o emoji personalizado
                     emoji = bot.get_emoji(1262842500125556866)
                     if emoji:
                         await message.add_reaction(emoji)
 
                     # Armazena a foto e o apelido do jogador
-                    with fotos_lock:  # Protege a lista com o lock
+                    with fotos_lock:
                         fotos.append({
-                            "message_id": message.id,  # Salvar o ID da mensagem para remover depois
+                            "message_id": message.id,
                             "url": attachment.url,
-                            "player": message.author.display_name,  # Usar o apelido em vez do nome de usuário
+                            "player": message.author.display_name,  # Apelido do jogador
                             "avatar": str(message.author.avatar.url if message.author.avatar else "")
                         })
-                    salvar_fotos()  # Salva as fotos no arquivo JSON
 
-    # Processa os comandos caso a mensagem seja um comando
+                    # Salva as fotos no arquivo JSON para persistência
+                    salvar_fotos()
+
+    # Processa comandos normalmente
     await bot.process_commands(message)
 
 # Evento para remover a foto quando a mensagem for deletada (opcional)
