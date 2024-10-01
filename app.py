@@ -6,6 +6,7 @@ from flask import Flask, jsonify
 import threading
 from flask_cors import CORS
 from threading import Lock
+import json
 
 # Pega o token da variável de ambiente
 TOKEN = os.getenv('TOKEN')
@@ -21,6 +22,24 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # Lista global para armazenar as fotos e informações dos jogadores, protegida por um lock
 fotos = []
 fotos_lock = Lock()  # Lock para proteger a lista de acessos simultâneos
+
+# Carregar as fotos do arquivo JSON (persistência)
+def carregar_fotos():
+    global fotos
+    try:
+        with open('fotos.json', 'r') as file:
+            fotos = json.load(file)
+    except FileNotFoundError:
+        fotos = []
+
+# Salvar as fotos no arquivo JSON (persistência)
+def salvar_fotos():
+    with fotos_lock:
+        with open('fotos.json', 'w') as file:
+            json.dump(fotos, file, indent=4)
+
+# Carregar fotos ao iniciar
+carregar_fotos()
 
 # ---- API Flask ----
 app = Flask(__name__)
@@ -142,6 +161,7 @@ async def on_message(message):
                             "player": str(message.author),
                             "avatar": str(message.author.avatar.url if message.author.avatar else "")
                         })
+                    salvar_fotos()  # Salva as fotos no arquivo JSON
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
