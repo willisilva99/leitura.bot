@@ -75,6 +75,30 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
+# Evento para reagir a imagens enviadas no chat específico
+@bot.event
+async def on_message(message):
+    # Certifica-se de que o bot não vai reagir às próprias mensagens
+    if message.author == bot.user:
+        return
+    
+    # Verifica se a mensagem foi enviada no canal com ID específico
+    if message.channel.id == 1262571048898138252:
+        # Verifica se a mensagem contém anexos (imagens ou outros arquivos)
+        if message.attachments:
+            for attachment in message.attachments:
+                # Verifica se o arquivo é uma imagem
+                if attachment.content_type.startswith('image/'):
+                    # Busca o emoji customizado pelo ID
+                    emoji = bot.get_emoji(1262842500125556866)
+                    if emoji:
+                        # Adiciona uma reação com o emoji customizado
+                        await message.add_reaction(emoji)
+    
+    # Processa os comandos caso a mensagem seja um comando
+    await bot.process_commands(message)
+
+
 # ---- API Flask ----
 app = Flask(__name__)
 CORS(app)
