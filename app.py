@@ -55,6 +55,40 @@ def get_fotos():
     with fotos_lock:
         return jsonify(fotos)
 
+# Adiciona rota para "Membros Online"
+@app.route('/jogadores_online', methods=['GET'])
+def jogadores_online():
+    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
+    if guild is None:
+        return jsonify({'error': 'Servidor não encontrado'}), 404
+
+    membros_online = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None,
+        'status': str(member.status).capitalize(),
+    } for member in guild.members if member.status != discord.Status.offline and not member.bot]
+
+    return jsonify(membros_online)
+
+# Adiciona rota para "Destaques"
+@app.route('/destaques', methods=['GET'])
+def get_destaques():
+    guild = bot.get_guild(1186390028990025820)  # Substitua pelo ID do seu servidor
+    if guild is None:
+        return jsonify({'error': 'Servidor não encontrado'}), 404
+
+    role = discord.utils.get(guild.roles, name="Destaque")
+    if not role:
+        return jsonify({'error': 'Cargo não encontrado'}), 404
+
+    members = [{
+        'id': member.id,
+        'display_name': member.display_name,
+        'avatar': member.avatar.url if member.avatar else None
+    } for member in role.members]
+    return jsonify(members)
+
 # ---- Bot Discord ----
 
 # Evento que indica quando o bot está pronto
