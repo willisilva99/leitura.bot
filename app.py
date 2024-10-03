@@ -25,9 +25,6 @@ atividades = [
     "enfrentando zumbis",
 ]
 
-# Armazena as URLs das fotos enviadas e os nomes dos jogadores
-fotos = []
-
 # ---- API Flask ----
 app = Flask(__name__)  
 CORS(app)
@@ -35,10 +32,6 @@ CORS(app)
 @app.route('/')
 def home():
     return jsonify({'status': 'Bot está online e rodando!'})
-
-@app.route('/fotos', methods=['GET'])
-def get_fotos():
-    return jsonify(fotos)
 
 @app.route('/destaques')
 def get_destaques():
@@ -126,7 +119,7 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
-# Evento para reagir a imagens enviadas no chat e armazenar fotos
+# Evento para reagir a imagens enviadas no chat
 @bot.event
 async def on_message(message):
     # Certifica-se de que o bot não vai reagir às próprias mensagens
@@ -145,24 +138,15 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Armazena a foto e o apelido (display_name) do jogador
-                    fotos.append({
-                        "id": message.id,  # Armazena o ID da mensagem
-                        "url": attachment.url,
-                        "player": message.author.display_name  # Usa o apelido (display name)
-                    })
-
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
 
-# Evento para detectar quando uma mensagem é deletada e remover a foto associada
+# Evento para detectar quando uma mensagem é deletada
 @bot.event
 async def on_message_delete(message):
     # Verifica se a mensagem deletada é do canal de fotos
     if message.channel.id == 1262571048898138252:
-        # Remove a foto correspondente com o ID da mensagem
-        global fotos
-        fotos = [foto for foto in fotos if foto["id"] != message.id]
+        print(f"A mensagem com ID {message.id} foi deletada.")
 
 # Função para rodar a API Flask em uma thread separada
 def run_api():
