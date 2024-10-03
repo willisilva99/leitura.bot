@@ -25,6 +25,15 @@ atividades = [
     "enfrentando zumbis",
 ]
 
+# Lista de mensagens apocalípticas
+mensagens_apocalipticas = [
+    'As hordas de zumbis estão à espreita, e {user} compartilhou algo importante!',
+    '{user} encontrou algo no apocalipse! Fiquem atentos!',
+    'O caos se aproxima... e {user} acabou de enviar algo!',
+    'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial.',
+    'A sobrevivência depende da informação. {user} acabou de compartilhar algo!',
+]
+
 # ---- API Flask ----
 app = Flask(__name__)  
 CORS(app)
@@ -119,7 +128,7 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
-# Evento para reagir a imagens enviadas no chat
+# Evento para reagir a imagens enviadas no chat e enviar um aviso
 @bot.event
 async def on_message(message):
     # Certifica-se de que o bot não vai reagir às próprias mensagens
@@ -137,6 +146,12 @@ async def on_message(message):
                     emoji = bot.get_emoji(1262842500125556866)
                     if emoji:
                         await message.add_reaction(emoji)
+
+                    # Enviar uma mensagem no canal de avisos 1186636197934661632
+                    aviso_channel = bot.get_channel(1186636197934661632)
+                    if aviso_channel:
+                        mensagem_aviso = random.choice(mensagens_apocalipticas).format(user=message.author.mention)
+                        await aviso_channel.send(mensagem_aviso)
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
