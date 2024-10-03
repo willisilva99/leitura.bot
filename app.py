@@ -25,20 +25,34 @@ atividades = [
     "enfrentando zumbis",
 ]
 
-# Lista de mensagens apocalípticas
+# Palavras-chave para interação do bot
+palavras_chave = ["minha base", "lua", "morri", "servidor caiu"]
+
+# Lista de mensagens apocalípticas para avisos
 mensagens_apocalipticas = [
     'As hordas de zumbis estão à espreita, e {user} compartilhou algo importante no canal {channel}!',
     '{user} encontrou algo no apocalipse no canal {channel}! Fiquem atentos!',
     'O caos se aproxima... e {user} acabou de enviar algo no canal {channel}!',
     'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial no canal {channel}.',
     'A sobrevivência depende da informação. {user} acabou de compartilhar algo no canal {channel}!',
-    'A resistência está se fortalecendo! {user} enviou algo de grande valor no canal {channel}!',
-    'O apocalipse não perdoa... mas {user} está preparado(a) e postou algo importante no canal {channel}!',
-    'Cuidado! O apocalipse avança e {user} revelou algo no canal {channel} que pode mudar tudo!',
-    'Em tempos sombrios, cada mensagem conta. {user} compartilhou algo valioso no canal {channel}!',
-    '{user} encontrou um novo caminho para a sobrevivência e postou no canal {channel}! Não perca!'
+    '{user} está enfrentando o caos e compartilhou algo no canal {channel}!',
+    'A resistência se fortalece! {user} compartilhou algo no canal {channel}!',
+    'Prepare-se para o inesperado... {user} postou algo no canal {channel}!',
+    'Cada mensagem é vital para a sobrevivência... {user} enviou algo no canal {channel}!',
+    '{user} desvendou algo importante no apocalipse e postou no canal {channel}!',
 ]
 
+# Lista de novas mensagens para respostas mencionando o usuário
+mensagens_resposta_apocaliptica = [
+    'O apocalipse nunca descansa... {user}, esteja preparado!',
+    'As trevas avançam, e {user} se destaca na luta pela sobrevivência!',
+    'Todos os olhos estão em você, {user}. O destino do apocalipse depende de suas próximas ações!',
+    'A resistência nunca foi tão forte... {user}, continue firme no caos!',
+    'O silêncio do apocalipse foi quebrado... e {user} está no centro disso tudo!',
+    'A noite se aproxima, {user}. Não deixe que os zumbis te alcancem!',
+    'Mesmo nas trevas mais profundas, {user} traz esperança para todos nós.',
+    'O destino do apocalipse está nas mãos de sobreviventes como você, {user}!'
+]
 
 # ---- API Flask ----
 app = Flask(__name__)  
@@ -134,16 +148,15 @@ async def on_member_join(member):
     if channel:
         await channel.send(mensagem_escolhida)
 
-# Evento para reagir a imagens enviadas no chat e enviar um aviso
+# Evento para reagir a imagens enviadas no chat de fotos e avisar no canal de avisos
 @bot.event
 async def on_message(message):
     # Certifica-se de que o bot não vai reagir às próprias mensagens
     if message.author == bot.user:
         return
 
-    # Verifica se a mensagem foi enviada no canal com ID específico
+    # Verifica se a mensagem foi enviada no canal de fotos (1262571048898138252)
     if message.channel.id == 1262571048898138252:
-        # Verifica se a mensagem contém anexos (imagens ou outros arquivos)
         if message.attachments:
             for attachment in message.attachments:
                 # Verifica se o arquivo é uma imagem
@@ -153,12 +166,25 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Enviar uma mensagem no canal de avisos 1186636197934661632
+                    # Enviar uma mensagem de aviso no canal de avisos (1186636197934661632)
                     aviso_channel = bot.get_channel(1186636197934661632)
                     if aviso_channel:
-                        # Menciona o usuário e o canal
                         mensagem_aviso = random.choice(mensagens_apocalipticas).format(user=message.author.mention, channel=f'<#{message.channel.id}>')
                         await aviso_channel.send(mensagem_aviso)
+
+    # Verifica se a mensagem foi enviada no canal de interação (1186636197934661632)
+    if message.channel.id == 1186636197934661632:
+        # Interação com palavras-chave
+        for palavra in palavras_chave:
+            if palavra in message.content.lower():
+                # Reage com um emoji aleatório
+                emoji = random.choice(['😱', '💀', '⚠️', '🧟‍♂️'])
+                await message.add_reaction(emoji)
+
+                # Enviar uma resposta apocalíptica mencionando o usuário
+                resposta_apocaliptica = random.choice(mensagens_resposta_apocaliptica).format(user=message.author.mention)
+                await message.channel.send(resposta_apocaliptica)
+                break  # Para garantir que só reaja uma vez por mensagem
 
     # Processa os comandos caso a mensagem seja um comando
     await bot.process_commands(message)
