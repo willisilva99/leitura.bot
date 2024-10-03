@@ -27,11 +27,11 @@ atividades = [
 
 # Lista de mensagens apocalípticas
 mensagens_apocalipticas = [
-    'As hordas de zumbis estão à espreita, e {user} compartilhou algo importante!',
-    '{user} encontrou algo no apocalipse! Fiquem atentos!',
-    'O caos se aproxima... e {user} acabou de enviar algo!',
-    'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial.',
-    'A sobrevivência depende da informação. {user} acabou de compartilhar algo!',
+    'As hordas de zumbis estão à espreita, e {user} compartilhou algo importante no canal {channel}!',
+    '{user} encontrou algo no apocalipse no canal {channel}! Fiquem atentos!',
+    'O caos se aproxima... e {user} acabou de enviar algo no canal {channel}!',
+    'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial no canal {channel}.',
+    'A sobrevivência depende da informação. {user} acabou de compartilhar algo no canal {channel}!',
 ]
 
 # ---- API Flask ----
@@ -150,7 +150,8 @@ async def on_message(message):
                     # Enviar uma mensagem no canal de avisos 1186636197934661632
                     aviso_channel = bot.get_channel(1186636197934661632)
                     if aviso_channel:
-                        mensagem_aviso = random.choice(mensagens_apocalipticas).format(user=message.author.mention)
+                        # Menciona o usuário e o canal
+                        mensagem_aviso = random.choice(mensagens_apocalipticas).format(user=message.author.mention, channel=f'<#{message.channel.id}>')
                         await aviso_channel.send(mensagem_aviso)
 
     # Processa os comandos caso a mensagem seja um comando
