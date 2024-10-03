@@ -49,6 +49,20 @@ mensagens_resposta_apocaliptica = [
     'O destino do apocalipse está nas mãos de sobreviventes como você, {user}!'
 ]
 
+# Lista de mensagens apocalípticas para avisos
+mensagens_apocalipticas = [
+    'As hordas de zumbis estão à espreita, e {user} compartilhou algo importante no canal {channel}!',
+    '{user} encontrou algo no apocalipse no canal {channel}! Fiquem atentos!',
+    'O caos se aproxima... e {user} acabou de enviar algo no canal {channel}!',
+    'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial no canal {channel}.',
+    'A sobrevivência depende da informação. {user} acabou de compartilhar algo no canal {channel}!',
+    '{user} está enfrentando o caos e compartilhou algo no canal {channel}!',
+    'A resistência se fortalece! {user} compartilhou algo no canal {channel}!',
+    'Prepare-se para o inesperado... {user} postou algo no canal {channel}!',
+    'Cada mensagem é vital para a sobrevivência... {user} enviou algo no canal {channel}!',
+    '{user} desvendou algo importante no apocalipse e postou no canal {channel}!',
+]
+
 # ---- API Flask ----
 app = Flask(__name__)  
 CORS(app)
@@ -164,7 +178,10 @@ async def on_message(message):
                     # Enviar uma mensagem de aviso no canal de avisos (1186636197934661632)
                     aviso_channel = bot.get_channel(1186636197934661632)
                     if aviso_channel:
-                        mensagem_aviso = random.choice(mensagens_resposta_apocaliptica).format(user=message.author.mention, channel=f'<#{message.channel.id}>')
+                        mensagem_aviso = random.choice(mensagens_apocalipticas).format(
+                            user=message.author.mention, 
+                            channel=message.channel.mention
+                        )
                         await aviso_channel.send(mensagem_aviso)
 
     # Verifica se a mensagem foi enviada no canal de interação (1186636197934661632)
