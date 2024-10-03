@@ -32,7 +32,13 @@ mensagens_apocalipticas = [
     'O caos se aproxima... e {user} acabou de enviar algo no canal {channel}!',
     'Um aviso do apocalipse! {user} compartilhou uma mensagem crucial no canal {channel}.',
     'A sobrevivência depende da informação. {user} acabou de compartilhar algo no canal {channel}!',
+    'A resistência está se fortalecendo! {user} enviou algo de grande valor no canal {channel}!',
+    'O apocalipse não perdoa... mas {user} está preparado(a) e postou algo importante no canal {channel}!',
+    'Cuidado! O apocalipse avança e {user} revelou algo no canal {channel} que pode mudar tudo!',
+    'Em tempos sombrios, cada mensagem conta. {user} compartilhou algo valioso no canal {channel}!',
+    '{user} encontrou um novo caminho para a sobrevivência e postou no canal {channel}! Não perca!'
 ]
+
 
 # ---- API Flask ----
 app = Flask(__name__)  
