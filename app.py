@@ -132,6 +132,11 @@ async def vote(ctx):
 async def missao(ctx):
     await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
 
+# ---- Comando !grupo ----
+@bot.command()
+async def grupo(ctx):
+    await ctx.send('Aqui está o link do Grupo: https://chat.whatsapp.com/ILn1A5UKIXwBpL7voHsDBo')
+
 # Evento para boas-vindas a novos membros
 @bot.event
 async def on_member_join(member):
