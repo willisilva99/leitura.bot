@@ -34,7 +34,7 @@ palavras_emojis = {
     "apocalipse": "🧟‍♂️",  # Emoji de zumbi
     "zumbis": "🧟‍♀️",  # Emoji de zumbis
     "medo": "😨",  # Emoji de medo
-    "fortaleza":, "🏰"  # Emoji de castelo
+    "fortaleza": "🏰",  # Emoji de castelo
     "chuva": "☔"  # Emoji de chuva
 }
 
