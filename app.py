@@ -138,6 +138,12 @@ async def missao(ctx):
 async def grupo(ctx):
     await ctx.send('Aqui está o link do Grupo: https://chat.whatsapp.com/ILn1A5UKIXwBpL7voHsDBo')
 
+# ---- Comando !grupo ----
+@bot.command()
+async def mapa(ctx):
+    await ctx.send('http://168.232.24.235:26915/static/index.html')
+
+
 # Evento para boas-vindas a novos membros
 @bot.event
 async def on_member_join(member):
