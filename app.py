@@ -141,7 +141,7 @@ async def grupo(ctx):
 # ---- Comando !grupo ----
 @bot.command()
 async def mapa(ctx):
-    await ctx.send('http://168.232.24.235:26915/static/index.html')
+    await ctx.send('https://novaera7d.netlify.app/')
 
 
 # Evento para boas-vindas a novos membros
