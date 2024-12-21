@@ -148,7 +148,7 @@ async def mapa(ctx):
 @bot.event
 async def on_member_join(member):
     # ID do canal de boas-vindas (substitua pelo ID do seu canal)
-    channel = bot.get_channel(1186636197934661632)
+    channel = bot.get_channel(1304040902498713631)
 
     # Lista de mensagens apocalípticas
     mensagens_boas_vindas = [
