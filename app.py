@@ -22,7 +22,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 atividades = [
     "sobrevivendo ao apocalipse",
     "jogando 7 Days to Die",
-    "enfrentando zumbis",
+    "enfrentando zumbi",
 ]
 
 # Dicionário de palavras-chave e emojis correspondentes
