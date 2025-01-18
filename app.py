@@ -118,30 +118,7 @@ async def mudar_atividade():
     atividade = random.choice(atividades)
     await bot.change_presence(activity=discord.Game(name=atividade))
 
-# ---- Comando !site ----
-@bot.command()
-async def site(ctx):
-    await ctx.send('Acesse o nosso site: http://novaera7d.com.br/')
 
-# ---- Comando !vote ----
-@bot.command()
-async def vote(ctx):
-    await ctx.send('Vote em nosso servidor: https://novaera7d.netlify.app/botao')
-
-# ---- Comando !missao ----
-@bot.command()
-async def missao(ctx):
-    await ctx.send('Aqui está o link da missão: https://youtu.be/2tNePGLm53s')
-
-# ---- Comando !grupo ----
-@bot.command()
-async def grupo(ctx):
-    await ctx.send('Aqui está o link do Grupo: https://chat.whatsapp.com/ILn1A5UKIXwBpL7voHsDBo')
-
-# ---- Comando !grupo ----
-@bot.command()
-async def mapa(ctx):
-    await ctx.send('https://novaera7d.netlify.app/')
 
 
 # Evento para boas-vindas a novos membros
