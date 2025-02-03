@@ -118,9 +118,6 @@ async def mudar_atividade():
     atividade = random.choice(atividades)
     await bot.change_presence(activity=discord.Game(name=atividade))
 
-
-
-
 # Evento para boas-vindas a novos membros
 @bot.event
 async def on_member_join(member):
@@ -149,8 +146,8 @@ async def on_member_join(member):
 # Evento para reagir a imagens enviadas no chat de fotos e avisar no canal de avisos
 @bot.event
 async def on_message(message):
-    # Certifica-se de que o bot não vai reagir às próprias mensagens
-    if message.author == bot.user:
+    # Ignora mensagens enviadas por qualquer bot
+    if message.author.bot:
         return
 
     # Verifica se a mensagem foi enviada no canal de fotos (1262571048898138252)
@@ -164,7 +161,7 @@ async def on_message(message):
                     if emoji:
                         await message.add_reaction(emoji)
 
-                    # Enviar uma mensagem de aviso no canal de avisos (1186636197934661632)
+                    # Envia uma mensagem de aviso no canal de avisos (1186636197934661632)
                     aviso_channel = bot.get_channel(1186636197934661632)
                     if aviso_channel:
                         mensagem_aviso = random.choice(mensagens_apocalipticas).format(
@@ -181,12 +178,12 @@ async def on_message(message):
                 # Reage com o emoji correspondente
                 await message.add_reaction(emoji)
 
-                # Enviar uma resposta apocalíptica mencionando o usuário
+                # Envia uma resposta apocalíptica mencionando o usuário
                 resposta_apocaliptica = random.choice(mensagens_resposta_apocaliptica).format(user=message.author.mention)
                 await message.channel.send(resposta_apocaliptica)
                 break  # Para garantir que só reaja uma vez por mensagem
 
-    # Processa os comandos caso a mensagem seja um comando
+    # Processa os comandos, caso a mensagem seja um comando
     await bot.process_commands(message)
 
 # Evento para detectar quando uma mensagem é deletada
